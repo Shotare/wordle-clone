@@ -30,6 +30,7 @@ export class GameBoardComponent implements OnInit {
             possibleSolutions[
                 Math.floor(Math.random() * possibleSolutions.length)
             ];
+        console.log(this.correctAnswer);
     }
 
     ngOnInit(): void {}
@@ -61,7 +62,6 @@ export class GameBoardComponent implements OnInit {
     }
 
     private submitWord() {
-        console.log(this.currentWord);
         if (this.position === 5) {
             if (answers.indexOf(this.currentWord) !== -1) {
                 this.analyzeSubmittedAnswer(this.currentWord);
@@ -78,6 +78,8 @@ export class GameBoardComponent implements OnInit {
     }
 
     private analyzeSubmittedAnswer(answer: string): void {
+        //TODO: If a word has two same letters, e.g. 'essay'
+        //it colors the second letter yellow - FIX
         for (let i = 0; i < answer.length; i++) {
             if (this.correctAnswer.indexOf(answer[i]) === i)
                 this.rows[this.attempt].letters[i].state = LetterState.Correct;

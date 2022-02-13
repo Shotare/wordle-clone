@@ -1,1 +1,5 @@
-<div class="game-tile">{{ letter }}</div>
+<div class="game-tile"
+    [ngClass] ="{
+        'correct': correctState === state,
+        'wrong-answer': wrongLetterState === state,
+        'wrong-position': wrongPositionState === state}">{{ letter }}</div>

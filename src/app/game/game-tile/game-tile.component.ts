@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { LetterState } from "./letter-state";
 
 @Component({
     selector: "game-tile",
@@ -7,6 +8,11 @@ import { Component, Input, OnInit } from "@angular/core";
 })
 export class GameTileComponent implements OnInit {
     @Input() letter: string = "";
+    @Input() state: LetterState = LetterState.TBD;
+
+    correctState: LetterState = LetterState.Correct;
+    wrongPositionState: LetterState = LetterState.WrongPosition;
+    wrongLetterState: LetterState = LetterState.Wrong;
 
     constructor() {}
 

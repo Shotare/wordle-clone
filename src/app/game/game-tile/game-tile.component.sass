@@ -1,3 +1,7 @@
+$wrongPositionColor: #c9b458
+$wrongLetterColor: #787c7e
+$correctLetterColor: #6aaa64
+    
 .game-tile
     font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif
     border: 2px solid
@@ -15,3 +19,12 @@
     //color: var(--tile-text-color)
     text-transform: uppercase
     user-select: none
+
+.correct
+    background-color: $correctLetterColor
+
+.wrong-position
+    background-color: $wrongPositionColor
+
+.wrong-answer
+    background-color: $wrongLetterColor
