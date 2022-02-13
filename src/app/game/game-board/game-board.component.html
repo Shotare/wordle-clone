@@ -1,0 +1,5 @@
+<div class="game-container">
+    <div class="game-board" tabindex="0" (keydown)="onKeyDownEvent($event)">
+        <game-row *ngFor="let row of rows" [letters]="row"> </game-row>
+    </div>
+</div>
