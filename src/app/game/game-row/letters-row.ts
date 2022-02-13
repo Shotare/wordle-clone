@@ -1,11 +1,23 @@
+import { Letter } from "../game-tile/letter";
+
 export class LettersRow {
-    letters: string[];
+    letters: Letter[];
 
     constructor() {
-        this.letters = ["", "", "", "", ""];
+        this.letters = [
+            new Letter(),
+            new Letter(),
+            new Letter(),
+            new Letter(),
+            new Letter(),
+        ];
     }
 
-    public insertLetter(letter: string, position: number) {
-        this.letters[position] = letter;
+    public insertLetter(letter: string, position: number): void {
+        this.letters[position].value = letter;
+    }
+
+    public removeLetter(position: number): void {
+        this.letters[position].value = "";
     }
 }
