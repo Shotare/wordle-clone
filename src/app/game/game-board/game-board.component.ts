@@ -3,6 +3,7 @@ import { LettersRow } from "../game-row/letters-row";
 import possibleSolutions from "../../../assets/solutions.json";
 import answers from "../../../assets/answers.json";
 import { LetterState } from "../game-tile/letter-state";
+import { LetterPositionPair } from "./letter-position-pair";
 
 @Component({
     selector: "game-board",
@@ -23,17 +24,24 @@ export class GameBoardComponent implements OnInit {
     position: number = 0;
 
     correctAnswer: string = "";
+    correctAnswerLettersPostions: LetterPositionPair[] = [];
     currentWord: string = "";
 
     constructor() {
-        this.correctAnswer =
-            possibleSolutions[
-                Math.floor(Math.random() * possibleSolutions.length)
-            ];
+        this.correctAnswer = "essay";
+            // possibleSolutions[
+            //     Math.floor(Math.random() * possibleSolutions.length)
+            // ];
+        for (let i = 0; i < this.correctAnswer.length; i++) {
+            this.correctAnswerLettersPostions.push(new LetterPositionPair(this.correctAnswer[i], i));
+        }
         console.log(this.correctAnswer);
+        console.log(this.correctAnswerLettersPostions);
     }
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        document.getElementById("game-board")?.focus();
+    }
 
     onKeyDownEvent(event: KeyboardEvent): void {
         switch (event.key) {
@@ -80,16 +88,30 @@ export class GameBoardComponent implements OnInit {
     private analyzeSubmittedAnswer(answer: string): void {
         //TODO: If a word has two same letters, e.g. 'essay'
         //it colors the second letter yellow - FIX
+        let correctAnswerClone = this.cloneAnswerLetters(this.correctAnswerLettersPostions);
         for (let i = 0; i < answer.length; i++) {
-            if (this.correctAnswer.indexOf(answer[i]) === i)
+            if (correctAnswerClone.some(letter => letter.letter === answer[i] && letter.position === i)) {
+                console.log(`Case: correct letter: ${answer[i]}, index: ${i}`);
                 this.rows[this.attempt].letters[i].state = LetterState.Correct;
+                correctAnswerClone = correctAnswerClone.filter(pair => pair.position !== i);
+                console.log(correctAnswerClone);
+                console.log(" ");
+            }
             else if (
-                this.correctAnswer.indexOf(answer[i]) > -1 &&
-                this.correctAnswer.indexOf(answer[i]) !== i
-            )
-                this.rows[this.attempt].letters[i].state =
-                    LetterState.WrongPosition;
-            else this.rows[this.attempt].letters[i].state = LetterState.Wrong;
+                correctAnswerClone.some((letter) => letter.letter === answer[i])
+            ) {
+                console.log(`Case: wrongPos letter: ${answer[i]}, index: ${i}`);
+                this.rows[this.attempt].letters[i].state = LetterState.WrongPosition;
+                correctAnswerClone = correctAnswerClone.filter(pair => pair.position !== i);
+                console.log(correctAnswerClone);
+                console.log(" ");
+            }
+            else {
+                console.log(`Case: wrong letter: ${answer[i]}, index: ${i}`);
+                this.rows[this.attempt].letters[i].state = LetterState.Wrong;
+                console.log(correctAnswerClone);
+                console.log(" ");
+            }
         }
         this.prepareNextRow();
     }
@@ -98,5 +120,12 @@ export class GameBoardComponent implements OnInit {
         this.attempt++;
         this.position = 0;
         this.currentWord = "";
+    }
+
+    private cloneAnswerLetters(answerLetters: LetterPositionPair[]): LetterPositionPair[] {
+        let result: LetterPositionPair[] = [];
+        answerLetters.forEach(pair => result.push(pair));
+
+        return result;
     }
 }
