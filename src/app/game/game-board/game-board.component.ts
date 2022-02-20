@@ -3,7 +3,6 @@ import { LettersRow } from "../game-row/letters-row";
 import possibleSolutions from "../../../assets/solutions.json";
 import answers from "../../../assets/answers.json";
 import { LetterState } from "../game-tile/letter-state";
-import { LetterPositionPair } from "./letter-position-pair";
 
 @Component({
     selector: "game-board",
@@ -24,19 +23,14 @@ export class GameBoardComponent implements OnInit {
     position: number = 0;
 
     correctAnswer: string = "";
-    correctAnswerLettersPostions: LetterPositionPair[] = [];
     currentWord: string = "";
 
     constructor() {
-        this.correctAnswer = "essay";
-            // possibleSolutions[
-            //     Math.floor(Math.random() * possibleSolutions.length)
-            // ];
-        for (let i = 0; i < this.correctAnswer.length; i++) {
-            this.correctAnswerLettersPostions.push(new LetterPositionPair(this.correctAnswer[i], i));
-        }
+        this.correctAnswer =
+            possibleSolutions[
+                Math.floor(Math.random() * possibleSolutions.length)
+            ];
         console.log(this.correctAnswer);
-        console.log(this.correctAnswerLettersPostions);
     }
 
     ngOnInit(): void {
@@ -86,46 +80,40 @@ export class GameBoardComponent implements OnInit {
     }
 
     private analyzeSubmittedAnswer(answer: string): void {
-        //TODO: If a word has two same letters, e.g. 'essay'
-        //it colors the second letter yellow - FIX
-        let correctAnswerClone = this.cloneAnswerLetters(this.correctAnswerLettersPostions);
+        // check correct letters
+        let checkingAnswer = this.correctAnswer;
         for (let i = 0; i < answer.length; i++) {
-            if (correctAnswerClone.some(letter => letter.letter === answer[i] && letter.position === i)) {
-                console.log(`Case: correct letter: ${answer[i]}, index: ${i}`);
+            console.log(answer[i] === checkingAnswer[i]);
+            if (answer[i] === checkingAnswer[i]) {
                 this.rows[this.attempt].letters[i].state = LetterState.Correct;
-                correctAnswerClone = correctAnswerClone.filter(pair => pair.position !== i);
-                console.log(correctAnswerClone);
-                console.log(" ");
-            }
-            else if (
-                correctAnswerClone.some((letter) => letter.letter === answer[i])
-            ) {
-                console.log(`Case: wrongPos letter: ${answer[i]}, index: ${i}`);
-                this.rows[this.attempt].letters[i].state = LetterState.WrongPosition;
-                correctAnswerClone = correctAnswerClone.filter(pair => pair.position !== i);
-                console.log(correctAnswerClone);
-                console.log(" ");
-            }
-            else {
-                console.log(`Case: wrong letter: ${answer[i]}, index: ${i}`);
-                this.rows[this.attempt].letters[i].state = LetterState.Wrong;
-                console.log(correctAnswerClone);
-                console.log(" ");
+                checkingAnswer = this.replaceCharAtIndex(checkingAnswer, " ", checkingAnswer.indexOf(answer[i]));
             }
         }
+
+        // check yellow and gray letters
+        for (let i = 0; i < answer.length; i++) {
+            if (answer[i] !== checkingAnswer[i] && checkingAnswer.includes(answer[i])) {
+                this.rows[this.attempt].letters[i].state = LetterState.WrongPosition;
+                checkingAnswer = this.replaceCharAtIndex(checkingAnswer, " ", checkingAnswer.indexOf(answer[i]));
+                console.log(checkingAnswer);
+            }
+            else if (this.rows[this.attempt].letters[i].state === LetterState.TBD){
+                this.rows[this.attempt].letters[i].state = LetterState.Wrong;
+            }
+        }
+
         this.prepareNextRow();
     }
 
     private prepareNextRow(): void {
-        this.attempt++;
-        this.position = 0;
-        this.currentWord = "";
+        if (this.attempt < 5) {
+            this.attempt++;
+            this.position = 0;
+            this.currentWord = "";
+        }
     }
 
-    private cloneAnswerLetters(answerLetters: LetterPositionPair[]): LetterPositionPair[] {
-        let result: LetterPositionPair[] = [];
-        answerLetters.forEach(pair => result.push(pair));
-
-        return result;
+    private replaceCharAtIndex(text: string, replacement: string, index: number): string {
+        return text.substring(0, index) + replacement + text.substring(index + 1);
     }
 }
